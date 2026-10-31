@@ -1,4 +1,5 @@
-﻿using SupportTicketingSystem.Application.DTOs;
+﻿
+using SupportTicketingSystem.Application.DTOs;
 
 namespace SupportTicketingSystem.Application.Interfaces
 {
@@ -6,6 +7,10 @@ namespace SupportTicketingSystem.Application.Interfaces
     {
         Task<(bool Success, string Message)> RegisterAsync(RegisterDto dto);
 
-        Task<(bool Success, string Message, object? Data)> LoginAsync(LoginDto dto);
+        Task<(bool Success, string Message, LoginResponseDto? Data)>
+            LoginAsync(LoginDto dto);
+
+        Task<(bool Success, string Message)>
+            CreateSupportAsync(CreateSupportDto dto);
     }
 }
