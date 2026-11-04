@@ -6,6 +6,10 @@ using SupportTicketingSystem.Application.Interfaces;
 using SupportTicketingSystem.Application.Services;
 using SupportTicketingSystem.Data.Context;
 using SupportTicketingSystem.Data.Repositories.UserRepositories;
+using SupportTicketingSystem.Data.Repositories.TicketRepositories;
+using SupportTicketingSystem.Data.Repositories.ManagerRepositories;
+using SupportTicketingSystem.Data.Repositories.ProductRepositories;
+using SupportTicketingSystem.Data.Repositories.SupportRepositories;
 using SupportTicketingSystem.WebAPI.Services;
 using System.Text;
 
@@ -25,10 +29,26 @@ namespace SupportTicketingSystem.WebAPI
                 options.UseSqlServer(
                     builder.Configuration.GetConnectionString("DefaultConnection")));
 
-            // Register Services
+            // Register User and Authentication Services
             builder.Services.AddScoped<IUserRepository, UserRepository>();
             builder.Services.AddScoped<IAuthService, AuthService>();
             builder.Services.AddScoped<JwtService>();
+
+            // Register Ticket Services
+            builder.Services.AddScoped<ITicketRepository, TicketRepository>();
+            builder.Services.AddScoped<ITicketService, TicketService>();
+
+            // Register Manager Services
+            builder.Services.AddScoped<IManagerRepository, ManagerRepository>();
+            builder.Services.AddScoped<IManagerService, ManagerService>();
+
+            // Register Product Services
+            builder.Services.AddScoped<IProductRepository, ProductRepository>();
+            builder.Services.AddScoped<IProductService, ProductService>();
+
+            // Register Support Member Services
+            builder.Services.AddScoped<ISupportRepository, SupportRepository>();
+            builder.Services.AddScoped<ISupportService, SupportService>();
 
             // Configure JWT Authentication
             var jwtSettings = builder.Configuration.GetSection("Jwt");
@@ -68,30 +88,32 @@ namespace SupportTicketingSystem.WebAPI
 
             builder.Services.AddSwaggerGen(options =>
             {
-                options.AddSecurityDefinition("Bearer", new Microsoft.OpenApi.Models.OpenApiSecurityScheme
-                {
-                    Name = "Authorization",
-                    Type = Microsoft.OpenApi.Models.SecuritySchemeType.Http,
-                    Scheme = "bearer",
-                    BearerFormat = "JWT",
-                    In = Microsoft.OpenApi.Models.ParameterLocation.Header,
-                    Description = "Enter your JWT Token"
-                });
+                options.AddSecurityDefinition("Bearer",
+                    new Microsoft.OpenApi.Models.OpenApiSecurityScheme
+                    {
+                        Name = "Authorization",
+                        Type = Microsoft.OpenApi.Models.SecuritySchemeType.Http,
+                        Scheme = "bearer",
+                        BearerFormat = "JWT",
+                        In = Microsoft.OpenApi.Models.ParameterLocation.Header,
+                        Description = "Enter your JWT Token"
+                    });
 
-                options.AddSecurityRequirement(new Microsoft.OpenApi.Models.OpenApiSecurityRequirement
-    {
-        {
-            new Microsoft.OpenApi.Models.OpenApiSecurityScheme
-            {
-                Reference = new Microsoft.OpenApi.Models.OpenApiReference
-                {
-                    Type = Microsoft.OpenApi.Models.ReferenceType.SecurityScheme,
-                    Id = "Bearer"
-                }
-            },
-            Array.Empty<string>()
-        }
-    });
+                options.AddSecurityRequirement(
+                    new Microsoft.OpenApi.Models.OpenApiSecurityRequirement
+                    {
+                        {
+                            new Microsoft.OpenApi.Models.OpenApiSecurityScheme
+                            {
+                                Reference = new Microsoft.OpenApi.Models.OpenApiReference
+                                {
+                                    Type = Microsoft.OpenApi.Models.ReferenceType.SecurityScheme,
+                                    Id = "Bearer"
+                                }
+                            },
+                            Array.Empty<string>()
+                        }
+                    });
             });
 
             var app = builder.Build();
