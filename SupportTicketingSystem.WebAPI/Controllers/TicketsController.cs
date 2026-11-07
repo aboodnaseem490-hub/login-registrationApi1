@@ -47,5 +47,24 @@ namespace SupportTicketingSystem.WebAPI.Controllers
                 ticketId = result.TicketId
             });
         }
+        [HttpPost("{ticketId}/confirm-resolution")]
+        public async Task<IActionResult> ConfirmResolution(int ticketId)
+        {
+            var userIdClaim = User.FindFirstValue(
+                ClaimTypes.NameIdentifier);
+
+            if (!int.TryParse(userIdClaim, out int clientId))
+            {
+                return Unauthorized();
+            }
+
+            await _ticketService.ConfirmResolutionAsync(
+                clientId, ticketId);
+
+            return Ok(new
+            {
+                message = "Ticket closed successfully."
+            });
+        }
     }
 }

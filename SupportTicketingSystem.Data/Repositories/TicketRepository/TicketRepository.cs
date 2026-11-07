@@ -19,6 +19,12 @@ namespace SupportTicketingSystem.Data.Repositories.TicketRepositories
                 .AnyAsync(p => p.Id == productId && p.IsActive);
         }
 
+        public async Task<Ticket?> GetByIdAsync(int ticketId)
+        {
+            return await _context.Tickets
+                .FirstOrDefaultAsync(t => t.Id == ticketId);
+        }
+
         public async Task AddAsync(Ticket ticket)
         {
             await _context.Tickets.AddAsync(ticket);

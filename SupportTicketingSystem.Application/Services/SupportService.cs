@@ -110,6 +110,26 @@ namespace SupportTicketingSystem.Application.Services
 
             return (false, "Invalid action. Use Accept or Reject.");
         }
+        public async Task<(bool Success, string Message)> ResolveTicketAsync(
+    int ticketId,
+    int supportMemberId)
+        {
+            var ticket = await _supportRepository
+                .GetTicketByIdForSupportAsync(ticketId, supportMemberId);
+
+            if (ticket == null)
+                return (false, "Ticket not found or not assigned to you.");
+
+            if (ticket.Status != "InProgress")
+                return (false, "Only in-progress tickets can be resolved.");
+
+            ticket.Status = "Resolved";
+            ticket.ResolvedAt = DateTime.UtcNow;
+
+            await _supportRepository.SaveChangesAsync();
+
+            return (true, "Ticket resolved successfully.");
+        }
 
     }
 }

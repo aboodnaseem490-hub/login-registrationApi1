@@ -18,5 +18,8 @@ namespace SupportTicketingSystem.Application.Interfaces
             int ticketId,
             int supportMemberId,
             string action);
+        Task<(bool Success, string Message)> ResolveTicketAsync(
+    int ticketId,
+    int supportMemberId);
     }
 }

@@ -53,5 +53,26 @@ namespace SupportTicketingSystem.WebAPI.Controllers
 
             return Ok(new { message = result.Message });
         }
+        [HttpPost("resolve-ticket/{ticketId}")]
+        public async Task<IActionResult> ResolveTicket(int ticketId)
+        {
+            var userIdClaim = User.FindFirst(
+                ClaimTypes.NameIdentifier)?.Value;
+
+            if (!int.TryParse(userIdClaim, out int supportMemberId))
+                return Unauthorized();
+
+            if (ticketId <= 0)
+                return BadRequest(new { message = "Invalid ticket ID." });
+
+            var result = await _supportService.ResolveTicketAsync(
+                ticketId,
+                supportMemberId);
+
+            if (!result.Success)
+                return BadRequest(new { message = result.Message });
+
+            return Ok(new { message = result.Message });
+        }
     }
 }

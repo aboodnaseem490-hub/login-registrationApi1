@@ -45,5 +45,25 @@ namespace SupportTicketingSystem.Application.Services
 
             return (true, "Ticket created successfully.", ticket.Id);
         }
+        public async Task ConfirmResolutionAsync(int clientId, int ticketId)
+        {
+            var ticket = await _ticketRepository.GetByIdAsync(ticketId);
+
+            if (ticket == null)
+                throw new KeyNotFoundException("Ticket not found.");
+
+            if (ticket.ClientId != clientId)
+                throw new UnauthorizedAccessException(
+                    "You are not allowed to confirm this ticket.");
+
+            if (ticket.Status != "Resolved")
+                throw new InvalidOperationException(
+                    "Only resolved tickets can be confirmed.");
+
+            ticket.Status = "Closed";
+            ticket.ClosedAt = DateTime.UtcNow;
+
+            await _ticketRepository.SaveChangesAsync();
+        }
     }
 }
